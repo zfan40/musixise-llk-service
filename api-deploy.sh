@@ -70,7 +70,7 @@ function deleteFiles(){
 }
 
 function copyFiles(){
-    echo "Copying files from $sourFile"
+    echo "Copying files from $sourFile to $destAbsPath"
     cp -fr $sourFile $destAbsPath
 
     echo "Copying files from $sourConfigFolder"
