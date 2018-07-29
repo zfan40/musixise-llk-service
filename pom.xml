@@ -24,6 +24,8 @@
 		<spring-boot.version>2.0.1.RELEASE</spring-boot.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<docker.image.prefix>blockly</docker.image.prefix>
+
 	</properties>
 
 	<dependencyManagement>
