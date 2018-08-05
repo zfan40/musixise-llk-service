@@ -1,47 +1,27 @@
 node {
-    def app
 
-    stage('Clone repository') {
-        /* Let's make sure we have the repository cloned to our workspace */
+   stage('Clone repository') { // for display purposes
+      // Get some code from a GitHub repository
+      git 'git@github.com:zfan40/musixise-llk-service.git'
+   }
 
-        checkout scm
-    }
+   stage('Build image') {
+      // Run the maven build
+      sh 'mvn clean package -DskipTests=true docker:build'
 
-    stage('Build image') {
-        /* This builds the actual image; synonymous to
-         * docker build on the command line */
+   }
 
-        sh 'mvn clean package -DskipTests=true docker:build'
-    }
+   stage('Push image') {
+      sh 'docker push registry.cn-qingdao.aliyuncs.com/musixise/musixise_blockly:0.0.1-SNAPSHOT'
+      sh 'docker push registry.cn-qingdao.aliyuncs.com/musixise/musixise_blockly:latest'
+   }
 
-    stage('Test image') {
-        /* Ideally, we would run a test framework against our image.
-         * For this example, we're using a Volkswagen-type approach ;-) */
-
-        app.inside {
-            sh 'echo "Tests passed"'
-        }
-    }
-
-    stage('Push image') {
-        /* Finally, we'll push the image with two tags:
-         * First, the incremental build number from Jenkins
-         * Second, the 'latest' tag.
-         * Pushing multiple tags is cheap, as all the layers are reused. */
-        docker.withRegistry('registry.cn-qingdao.aliyuncs.com/musixise/musixise_blockly', 'aliyun-docker-hub-credentials') {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
-        }
-    }
-
-    stage('Deploy image') {
-            /* Ideally, we would run a test framework against our image.
-             * For this example, we're using a Volkswagen-type approach ;-) */
-
-            app.inside {
-                sh 'echo "Deploy passed"'
-                sh 'docker run  --name musixise-blockly --link=mysql:mysql -d -p8083:8080 -e "SPRING_PROFILES_ACTIVE=prod" registry.cn-qingdao.aliyuncs.com/musixise/musixise_blockly'
-
-            }
-        }
+   stage('deploy iamegs'){
+      try{
+        sh 'docker rm -f musixise-blockly'
+      }catch(e){
+        // err message
+      }
+      sh 'docker run  --name musixise-blockly --link=mysql:mysql -d -p8083:8080 -e "SPRING_PROFILES_ACTIVE=prod" registry.cn-qingdao.aliyuncs.com/musixise/musixise_blockly'
+   }
 }
