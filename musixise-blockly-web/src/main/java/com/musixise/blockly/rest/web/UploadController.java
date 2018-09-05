@@ -5,7 +5,7 @@ import com.musixise.blockly.api.result.MusixiseResponse;
 import com.musixise.blockly.api.web.service.UploadApi;
 import com.musixise.blockly.service.aop.AppMethod;
 import com.musixise.blockly.service.manager.UploaderManager;
-import com.musixise.blockly.service.service.impl.UploadServiceQiniuImpl;
+import com.musixise.blockly.service.service.UploadService;
 import com.musixise.blockly.service.utils.FileUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +23,7 @@ public class UploadController implements UploadApi {
     UploaderManager uploaderManager;
 
     @Resource
-    UploadServiceQiniuImpl uploadServiceQiniu;
+    UploadService uploadServiceQiniuImpl;
 
     /**
      * 上传图片
@@ -35,7 +35,7 @@ public class UploadController implements UploadApi {
     @Override
     public MusixiseResponse uploadPic(@RequestBody @RequestParam("files")MultipartFile file) {
 
-        uploaderManager.setUploadService(new UploadServiceQiniuImpl());
+        uploaderManager.setUploadService(uploadServiceQiniuImpl);
 
         //生成文件名
         String fileName = uploaderManager.buildFileName(file.getOriginalFilename());
@@ -60,7 +60,7 @@ public class UploadController implements UploadApi {
     public MusixiseResponse uploadAudio(Long uid, @RequestParam String data,
                                         @RequestParam String fname) {
 
-        uploaderManager.setUploadService(uploadServiceQiniu);
+        uploaderManager.setUploadService(uploadServiceQiniuImpl);
 
         byte[] bt = null;
         try {
